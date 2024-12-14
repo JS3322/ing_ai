@@ -3,6 +3,16 @@
 #### env
 - base python : 3.9
 
+#### test case
+- 가상환경에서 다음 명령어 실행
+```
+uvicorn _serve_app:app --host 0.0.0.0 --port 8000
+```
+- 병렬처리 성능 테스트(Apache Bench)
+```
+ab -n 1000 -c 10 -p request.json -T application/json http://localhost:8000/execute
+```
+
 #### command
 - preprocess
 ```
