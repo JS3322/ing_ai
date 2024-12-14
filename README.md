@@ -12,6 +12,14 @@ uvicorn _serve_app:app --host 0.0.0.0 --port 8000
 ```
 ab -n 1000 -c 10 -p request.json -T application/json http://localhost:8000/execute
 ```
+- _serve_app_ray.py 호출 명령어
+```
+uvicorn _serve_app_ray:app --host 0.0.0.0 --port 8000
+curl -X POST "http://localhost:8000/execute" \
+     -H "Content-Type: application/json" \
+     -d '{"data": [1, 2, 3, 4, 5]}'
+
+```
 
 #### command
 - preprocess
