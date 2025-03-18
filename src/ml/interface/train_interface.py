@@ -5,7 +5,7 @@ import pandas as pd
 
 class HBMBandwidthModel:
     def __init__(self, train_csv='reference/train.csv', test_csv='reference/test.csv'):
-        # 현재 스크립트의 절대 경로를 기준으로 프로젝트 루트 구하기
+        # 현재 스크립트의 절대 경로를 기준으로 프로젝트 루트 구하기 (프로젝트의 절대 경로 필요 검토와 각 스텝을 모듈화 고려)
         # __file__ 변수가 없으면 os.getcwd()를 사용하세요.
         self.project_root = os.path.abspath(os.path.dirname(__file__))
         self.train_csv_path = os.path.join(train_csv)
