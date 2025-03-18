@@ -4,20 +4,12 @@ import pandas as pd
 
 
 class HBMSyntheticDataGenerator:
-    def __init__(self, n_samples=1000, output_subdir='reference'):
+    def __init__(self, n_samples=1000, output_dir='reference'):
         # 재현성을 위한 시드 설정
         tf.random.set_seed(42)
+
         self.n_samples = n_samples
-
-        # 프로젝트 루트 디렉토리 결정: __file__ 변수가 없으면 현재 작업 디렉토리 사용
-        try:
-            # 이 스크립트가 프로젝트의 하위 디렉토리에 있다면, 상위 폴더(루트)를 지정합니다.
-            self.project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        except NameError:
-            self.project_root = os.path.abspath(os.getcwd())
-
-        # 프로젝트 루트의 reference 폴더를 출력 디렉토리로 지정
-        self.output_dir = os.path.join(self.project_root, output_subdir)
+        self.output_dir = output_dir
 
         # 생성될 DataFrame을 저장할 변수 초기화
         self.df = None
@@ -78,7 +70,6 @@ class HBMSyntheticDataGenerator:
     def save_data(self):
         """
         학습 데이터와 테스트 데이터를 CSV 파일로 저장합니다.
-        저장 경로는 프로젝트 루트의 reference 폴더입니다.
         """
         if self.train_df is None or self.test_df is None:
             raise ValueError("먼저 split_and_shuffle()를 호출하여 데이터를 분할하세요.")
@@ -89,11 +80,3 @@ class HBMSyntheticDataGenerator:
         self.train_df.to_csv(train_path, index=False)
         self.test_df.to_csv(test_path, index=False)
         print(f"합성 데이터가 '{train_path}'와 '{test_path}'에 저장되었습니다.")
-
-
-# 클래스 인스턴스를 생성하여 전체 파이프라인 수행
-# if __name__ == "__main__":
-#     data_generator = HBMSyntheticDataGenerator(n_samples=1000, output_dir='reference')
-#     data_generator.generate_data()
-#     data_generator.split_and_shuffle(train_ratio=0.8)
-#     data_generator.save_data()
