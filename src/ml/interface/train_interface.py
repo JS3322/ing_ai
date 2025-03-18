@@ -95,7 +95,7 @@ class HBMBandwidthModel:
         """
         현재 학습된 모델을 지정된 디렉토리에 HDF5 형식으로 저장합니다.
         """
-        # project_root 또는 절대 경로 필요
+        # project_root 또는 절대 경로 필요?
         save_path = os.path.join(self.project_root, save_dir)
         os.makedirs(save_path, exist_ok=True)
         full_save_path = os.path.join(save_path, filename)
