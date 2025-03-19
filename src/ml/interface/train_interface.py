@@ -1,6 +1,7 @@
 import os
 import tensorflow as tf
 import pandas as pd
+from datetime import datetime
 
 
 class HBMBandwidthModel:
@@ -95,13 +96,25 @@ class HBMBandwidthModel:
 
     def save_model(self, filename='model.h5'):
         """
-        현재 학습된 모델을 model_path 디렉토리에 HDF5 형식으로 저장합니다.
+        현재 학습된 모델을 타임스탬프가 포함된 이름으로 저장하고 model.h5 심볼릭 링크를 생성합니다.
         """
         os.makedirs(self.model_path, exist_ok=True)
-        full_save_path = os.path.join(self.model_path, filename)
-        # HDF5 형식으로 모델 저장 (.h5 확장자 사용)
-        self.model.save(full_save_path)
-        print(f"모델이 '{full_save_path}'에 저장되었습니다.")
+        
+        # 타임스탬프로 된 모델 파일명 생성 (YYYYMMDD_HHMMSS.h5)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        timestamped_filename = f"{timestamp}.h5"
+        timestamped_path = os.path.join(self.model_path, timestamped_filename)
+        
+        # 모델 저장
+        self.model.save(timestamped_path)
+        print(f"모델이 '{timestamped_path}'에 저장되었습니다.")
+        
+        # model.h5 심볼릭 링크 생성
+        link_path = os.path.join(self.model_path, filename)
+        if os.path.exists(link_path):
+            os.remove(link_path)  # 기존 링크가 있다면 제거
+        os.symlink(timestamped_filename, link_path)
+        print(f"심볼릭 링크 '{link_path}'가 생성되었습니다.")
 
 
 def check_gpu():
