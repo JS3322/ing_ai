@@ -1,0 +1,6 @@
+{
+    "step": "makedata",
+    "n_samples": 1000,
+    "output_dir": "reference",
+    "train_ratio": 0.8
+}

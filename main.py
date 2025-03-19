@@ -4,6 +4,12 @@ from src.doe.interface.make_data_interface import HBMSyntheticDataGenerator
 from src.ml.interface.train_interface import HBMBandwidthModel, check_gpu
 
 def main(json_path):
+    """
+    JSON 파일을 읽어서 step 키 값에 따라 작업을 수행하는 함수
+    
+    Args:
+        json_path (str): JSON 설정 파일의 경로
+    """
     with open(json_path, 'r') as f:
         config = json.load(f)
     
@@ -37,7 +43,8 @@ def main(json_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='HBM 모델 학습 및 데이터 생성 스크립트')
-    parser.add_argument('--config', type=str, required=True, help='설정 JSON 파일 경로')
+    parser.add_argument('json_path', type=str, 
+                      help='설정 JSON 파일의 경로 (예: _source/example/request_makedata.json)')
     args = parser.parse_args()
     
-    main(args.config)
+    main(args.json_path)
