@@ -1,5 +1,6 @@
 import json
 import argparse
+import os
 from src.doe.interface.make_data_interface import HBMSyntheticDataGenerator
 from src.ml.interface.train_interface import HBMBandwidthModel, check_gpu
 
@@ -10,8 +11,19 @@ def main(json_path):
     Args:
         json_path (str): JSON 설정 파일의 경로
     """
-    with open(json_path, 'r') as f:
-        config = json.load(f)
+    # JSON 파일 존재 여부 확인
+    if not os.path.exists(json_path):
+        raise FileNotFoundError(f"JSON 파일을 찾을 수 없습니다: {json_path}")
+    
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"JSON 파일 형식이 잘못되었습니다: {e}")
+    
+    # 필수 키 확인
+    if 'step' not in config:
+        raise KeyError("JSON 파일에 'step' 키가 없습니다.")
     
     step = config.get('step')
     
@@ -39,12 +51,20 @@ def main(json_path):
         hbm_model.save_model()
     
     else:
-        raise ValueError(f"Unknown step: {step}")
+        raise ValueError(f"지원하지 않는 step입니다: {step}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='HBM 모델 학습 및 데이터 생성 스크립트')
     parser.add_argument('json_path', type=str, 
                       help='설정 JSON 파일의 경로 (예: _source/example/request_makedata.json)')
-    args = parser.parse_args()
     
-    main(args.json_path)
+    try:
+        args = parser.parse_args()
+        main(args.json_path)
+    except SystemExit as e:
+        print("\n사용법: python main.py <json_path>")
+        print("예시: python main.py _source/example/request_makedata.json")
+        exit(1)
+    except Exception as e:
+        print(f"오류 발생: {str(e)}")
+        exit(1)
