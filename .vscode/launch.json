@@ -19,6 +19,14 @@
             "program": "${workspaceFolder}/main.py",
             "args": ["_source/example/request_train.json"],
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Run Inference",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/inference_example.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }

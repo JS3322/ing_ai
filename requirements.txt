@@ -1,4 +1,6 @@
-tensorflow==2.19.0
+# tensorflow==2.19.0
+torch
 numpy
 pandas==2.2.3
 pytest
+transformers

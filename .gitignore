@@ -1,6 +1,8 @@
 # model
 *.pth
 *.h5
+reference/data/
+reference/models/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
