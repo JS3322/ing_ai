@@ -4,7 +4,7 @@ import pandas as pd
 
 
 class HBMSyntheticDataGenerator:
-    def __init__(self, n_samples=1000, output_dir='reference'):
+    def __init__(self, n_samples=1000, output_dir='reference/data'):
         # 재현성을 위한 시드 설정
         tf.random.set_seed(42)
 
