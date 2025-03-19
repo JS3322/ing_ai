@@ -140,3 +140,7 @@ dmypy.json
 
 # intelli j
 .idea/
+
+# Environment variables
+.env.*
+!.env.sample

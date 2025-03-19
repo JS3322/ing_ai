@@ -4,3 +4,4 @@ numpy
 pandas==2.2.3
 pytest
 transformers
+python-dotenv

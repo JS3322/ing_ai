@@ -2,6 +2,7 @@ import json
 import argparse
 import os
 from src.doe.interface.make_data_interface import HBMSyntheticDataGenerator
+from src.common.config import load_environment, get_env_var
 from src.ml.interface.train_interface import HBMBandwidthModel, check_gpu
 
 def main(json_path):
@@ -11,6 +12,12 @@ def main(json_path):
     Args:
         json_path (str): JSON 설정 파일의 경로
     """
+    # 환경 변수에서 설정 가져오기
+    default_n_samples = int(get_env_var('DEFAULT_N_SAMPLES', '1000'))
+    default_train_ratio = float(get_env_var('DEFAULT_TRAIN_RATIO', '0.8'))
+    default_epochs = int(get_env_var('DEFAULT_EPOCHS', '100'))
+    default_batch_size = int(get_env_var('DEFAULT_BATCH_SIZE', '32'))
+    
     # JSON 파일 존재 여부 확인
     if not os.path.exists(json_path):
         raise FileNotFoundError(f"JSON 파일을 찾을 수 없습니다: {json_path}")
@@ -30,11 +37,11 @@ def main(json_path):
     if step == 'makedata':
         # 데이터 생성 단계
         data_generator = HBMSyntheticDataGenerator(
-            n_samples=config.get('n_samples', 1000),
+            n_samples=config.get('n_samples', default_n_samples),
             output_dir=config.get('output_dir', 'reference')
         )
         data_generator.generate_data()
-        data_generator.split_and_shuffle(train_ratio=config.get('train_ratio', 0.8))
+        data_generator.split_and_shuffle(train_ratio=config.get('train_ratio', default_train_ratio))
         data_generator.save_data()
     
     elif step == 'train':
@@ -47,8 +54,8 @@ def main(json_path):
         hbm_model.load_data()
         hbm_model.create_model()
         hbm_model.train_model(
-            epochs=config.get('epochs', 100),
-            batch_size=config.get('batch_size', 32)
+            epochs=config.get('epochs', default_epochs),
+            batch_size=config.get('batch_size', default_batch_size)
         )
         hbm_model.evaluate_model()
         hbm_model.save_model()
@@ -57,6 +64,9 @@ def main(json_path):
         raise ValueError(f"지원하지 않는 step입니다: {step}")
 
 if __name__ == "__main__":
+    # 환경 변수 로드 (가장 먼저 실행)
+    load_environment()
+    
     parser = argparse.ArgumentParser(description='HBM 모델 학습 및 데이터 생성 스크립트')
     parser.add_argument('json_path', type=str, 
                       help='설정 JSON 파일의 경로 (예: _source/example/request_makedata.json)')
