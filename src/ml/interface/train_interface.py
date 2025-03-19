@@ -4,12 +4,14 @@ import pandas as pd
 
 
 class HBMBandwidthModel:
-    def __init__(self, train_csv='reference/train.csv', test_csv='reference/test.csv'):
+    def __init__(self, data_path='reference', model_path=None):
         # 현재 스크립트의 절대 경로를 기준으로 프로젝트 루트 구하기 (프로젝트의 절대 경로 필요 검토와 각 스텝을 모듈화 고려)
         # __file__ 변수가 없으면 os.getcwd()를 사용하세요.
         self.project_root = os.path.abspath(os.path.dirname(__file__))
-        self.train_csv_path = os.path.join(train_csv)
-        self.test_csv_path = os.path.join(test_csv)
+        self.data_path = data_path
+        self.model_path = model_path if model_path else data_path
+        self.train_csv_path = os.path.join(self.data_path, 'train.csv')
+        self.test_csv_path = os.path.join(self.data_path, 'test.csv')
         self.model = None
         self.X_train = None
         self.y_train = None
@@ -91,14 +93,12 @@ class HBMBandwidthModel:
         """
         return self.model.predict(X)
 
-    def save_model(self, save_dir='saved_model', filename='model.h5'):
+    def save_model(self, filename='model.h5'):
         """
-        현재 학습된 모델을 지정된 디렉토리에 HDF5 형식으로 저장합니다.
+        현재 학습된 모델을 model_path 디렉토리에 HDF5 형식으로 저장합니다.
         """
-        # project_root 또는 절대 경로 필요??
-        save_path = os.path.join(self.project_root, save_dir)
-        os.makedirs(save_path, exist_ok=True)
-        full_save_path = os.path.join(save_path, filename)
+        os.makedirs(self.model_path, exist_ok=True)
+        full_save_path = os.path.join(self.model_path, filename)
         # HDF5 형식으로 모델 저장 (.h5 확장자 사용)
         self.model.save(full_save_path)
         print(f"모델이 '{full_save_path}'에 저장되었습니다.")

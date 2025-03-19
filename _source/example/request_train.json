@@ -1,5 +1,7 @@
 {
     "step": "train",
+    "data_path": "reference/data",
+    "model_path": "reference/models",
     "epochs": 100,
     "batch_size": 32
 }

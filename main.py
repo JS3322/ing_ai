@@ -40,7 +40,10 @@ def main(json_path):
     elif step == 'train':
         # 모델 학습 단계
         check_gpu()
-        hbm_model = HBMBandwidthModel()
+        hbm_model = HBMBandwidthModel(
+            data_path=config.get('data_path', 'reference'),
+            model_path=config.get('model_path')
+        )
         hbm_model.load_data()
         hbm_model.create_model()
         hbm_model.train_model(
