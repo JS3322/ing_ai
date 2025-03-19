@@ -3,6 +3,7 @@ import torch
 import numpy as np
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from huggingface_hub import login
+from src.common.config import load_environment
 
 class GemmaInference:
     def __init__(self, model_path=None, cache_dir="models", token=None):
@@ -166,6 +167,9 @@ class GemmaInference:
         return generated_texts
 
 def main():
+    # 환경 변수 로드 (가장 먼저 실행)
+    load_environment()
+    
     # Hugging Face 토큰을 환경 변수에서 가져옴
     token = os.getenv('HUGGINGFACE_TOKEN')
     if not token:

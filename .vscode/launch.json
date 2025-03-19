@@ -24,7 +24,7 @@
             "name": "Run Inference",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/inference_example.py",
+            "program": "${workspaceFolder}/inference_example_gpt4.py",
             "console": "integratedTerminal",
             "justMyCode": true
         }
