@@ -1,11 +1,30 @@
 import torch
 from transformers import AutoTokenizer, Gemma3ForConditionalGeneration
+import os
 
 def main():
+    # 모델 저장 경로 설정
+    model_cache_dir = "reference/models"
+    os.makedirs(model_cache_dir, exist_ok=True)
+    
+    # Hugging Face 토큰 설정
+    hf_token = ''
+    if not hf_token:
+        raise ValueError("HUGGINGFACE_TOKEN 환경 변수를 설정해주세요.")
+
     # 모델 이름과 토크나이저 및 모델 로드
     model_name = "google/gemma-3-4b-it"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = Gemma3ForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.bfloat16)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name, 
+        token=hf_token,
+        cache_dir=model_cache_dir
+    )
+    model = Gemma3ForConditionalGeneration.from_pretrained(
+        model_name, 
+        token=hf_token, 
+        torch_dtype=torch.bfloat16,
+        cache_dir=model_cache_dir
+    )
 
     # GPU 사용 가능 시 모델을 GPU로 이동
     if torch.cuda.is_available():

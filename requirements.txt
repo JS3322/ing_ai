@@ -4,5 +4,5 @@ numpy
 pandas==2.2.3
 pytest
 # transformers
-# pip install git+https://github.com/huggingface/transformers@v4.49.0-Gemma-3
+git+https://github.com/huggingface/transformers@v4.49.0-Gemma-3
 python-dotenv
