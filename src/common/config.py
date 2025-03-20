@@ -3,13 +3,27 @@ import getpass
 from dotenv import load_dotenv
 
 
+def find_project_root():
+    """
+    프로젝트 루트 디렉토리를 찾습니다.
+    main.py 파일이 있는 디렉토리를 프로젝트 루트로 간주합니다.
+    """
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    while current_dir:
+        if os.path.exists(os.path.join(current_dir, 'main.py')):
+            return current_dir
+        parent_dir = os.path.dirname(current_dir)
+        if parent_dir == current_dir:  # 루트 디렉토리에 도달
+            break
+        current_dir = parent_dir
+    raise FileNotFoundError("프로젝트 루트 디렉토리(main.py가 있는 위치)를 찾을 수 없습니다.")
+
 def load_environment():
     """
-    현재 사용자 계정의 환경 변수 파일만 로드합니다.
+    현재 사용자 계정의 환경 변수 파일을 로드합니다.
     """
     # 프로젝트 루트 디렉토리 찾기
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+    project_root = find_project_root()
     
     # 사용자별 환경 파일 로드
     current_user = getpass.getuser()

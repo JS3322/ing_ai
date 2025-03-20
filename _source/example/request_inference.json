@@ -1,0 +1,8 @@
+{
+    "step": "inference",
+    "data_path": "reference/data",
+    "model_path": "reference/models",
+    "epochs": 100,
+    "batch_size": 32,
+    "question": "Gemma 3 모델의 장점은 무엇입니까?"
+}

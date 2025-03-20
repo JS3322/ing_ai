@@ -4,6 +4,7 @@ import os
 from src.doe.interface.make_data_interface import HBMSyntheticDataGenerator
 from src.common.config import load_environment, get_env_var
 from src.ml.interface.train_interface import HBMBandwidthModel, check_gpu
+from src.inference.interface.inference_interface import Gemma3Inference
 
 def main(json_path):
     """
@@ -17,6 +18,8 @@ def main(json_path):
     default_train_ratio = float(get_env_var('DEFAULT_TRAIN_RATIO', '0.8'))
     default_epochs = int(get_env_var('DEFAULT_EPOCHS', '100'))
     default_batch_size = int(get_env_var('DEFAULT_BATCH_SIZE', '32'))
+    hf_token = get_env_var('HUGGINGFACE_TOKEN')
+    default_model_cache_dir = get_env_var('DEFAULT_MODEL_CACHE_DIR', 'reference/models')
     
     # JSON 파일 존재 여부 확인
     if not os.path.exists(json_path):
@@ -59,6 +62,23 @@ def main(json_path):
         )
         hbm_model.evaluate_model()
         hbm_model.save_model()
+
+    elif step == 'inference':
+        # Gemma3 인스턴스 생성
+        gemma3 = Gemma3Inference(
+            hf_token=hf_token,
+            model_cache_dir=config.get('model_path', default_model_cache_dir)
+        )
+        
+        # JSON에서 질문 가져오기
+        question = config.get('question', "Gemma 3 모델의 장점은 무엇입니까?")
+        
+        # 응답 생성
+        answer = gemma3.generate_response(question)
+        
+        # 결과 출력
+        print(f"질문: {question}")
+        print(f"답변: {answer}")
     
     else:
         raise ValueError(f"지원하지 않는 step입니다: {step}")
