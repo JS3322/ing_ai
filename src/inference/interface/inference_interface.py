@@ -14,7 +14,7 @@ class Gemma3Inference:
             raise ValueError("HUGGINGFACE_TOKEN 환경 변수를 설정해주세요.")
 
         # 모델 이름과 토크나이저 및 모델 로드
-        self.model_name = "google/gemma-3-4b-it"
+        self.model_name = "google/gemma-3-4b-it" #google/gemma-3-12b-it google/gemma-3-4b-it
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.model_name, 
             token=self.hf_token,

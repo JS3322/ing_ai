@@ -4,5 +4,5 @@
     "model_path": "reference/models",
     "epochs": 100,
     "batch_size": 32,
-    "question": "Gemma 3 모델의 장점은 무엇입니까?"
+    "question": "윈도우와 macOS를 비교하면 macOS가 부드러운 ux를 제공합니다. 왜 이렇게 차이가 나는지 기술적으로 설명하시오"
 }
