@@ -46,6 +46,125 @@ python main.py --data_dir ./_source/data --predict_data predict.csv --predict
 ```
 python main.py --data_dir ./_source/data --train_data train.csv --test_data test.csv --optimize
 ```
+
+#### 프로젝트 실행환경
+
+##### 의존성 관리
+- **Python 버전**: 3.10 이상 요구 (pyproject.toml 기준)
+- **패키지 매니저**: `uv` (권장) 또는 `pip`
+- **가상환경**: `.venv` 디렉토리 사용
+
+##### uv를 이용한 환경 설정 (권장)
+```bash
+# uv 설치 (없는 경우)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 프로젝트 의존성 설치
+uv sync
+
+# 가상환경 활성화
+source .venv/bin/activate  # Linux/Mac
+# 또는
+.venv\Scripts\activate     # Windows
+```
+
+##### pip를 이용한 환경 설정 (대안)
+```bash
+# 가상환경 생성
+python -m venv .venv
+
+# 가상환경 활성화
+source .venv/bin/activate  # Linux/Mac
+# 또는
+.venv\Scripts\activate     # Windows
+
+# 의존성 설치
+pip install -r requirements.txt
+```
+
+#### main.py 사용법
+
+메인 스크립트는 JSON 설정 파일을 입력으로 받아 step에 따라 다른 작업을 수행합니다.
+
+##### 기본 사용법
+```bash
+python main.py <json_config_path>
+```
+
+##### 지원하는 Step들
+
+###### 1. 데이터 생성 (makedata)
+```bash
+python main.py _source/example/request_makedata.json
+```
+설정 파일 예시 (`_source/example/request_makedata.json`):
+```json
+{
+    "step": "makedata",
+    "n_samples": 1000,
+    "output_dir": "reference/data",
+    "train_ratio": 0.8
+}
+```
+
+###### 2. 모델 학습 (train)
+```bash
+python main.py _source/example/request_train.json
+```
+설정 파일 예시 (`_source/example/request_train.json`):
+```json
+{
+    "step": "train",
+    "data_path": "reference/data",
+    "model_path": "reference/models",
+    "epochs": 100,
+    "batch_size": 32
+}
+```
+
+###### 3. 추론 (inference)
+```bash
+python main.py _source/example/request_inference.json
+```
+설정 파일 예시 (`_source/example/request_inference.json`):
+```json
+{
+    "step": "inference",
+    "data_path": "reference/data",
+    "model_path": "reference/models",
+    "epochs": 100,
+    "batch_size": 32,
+    "question": "윈도우와 macOS를 비교하면 macOS가 부드러운 ux를 제공합니다. 왜 이렇게 차이가 나는지 기술적으로 설명하시오"
+}
+```
+
+##### 환경 변수 설정
+
+프로젝트는 `.env` 파일을 통해 환경 변수를 관리합니다. 다음과 같은 환경 변수를 설정할 수 있습니다:
+
+```bash
+# .env 파일 예시
+DEFAULT_N_SAMPLES=1000
+DEFAULT_TRAIN_RATIO=0.8
+DEFAULT_EPOCHS=100
+DEFAULT_BATCH_SIZE=32
+DEFAULT_MODEL_CACHE_DIR=reference/models
+HUGGINGFACE_TOKEN=your_hf_token_here
+```
+
+##### 프로젝트 구조
+```
+project_ai_model/
+├── src/                    # 소스 코드 모듈
+├── _source/               # 데이터 및 설정 파일
+│   ├── data/             # 학습/테스트 데이터
+│   └── example/          # JSON 설정 파일 예시
+├── reference/             # 모델 및 참조 데이터
+├── main.py               # 메인 실행 스크립트
+├── pyproject.toml        # uv 프로젝트 설정
+├── requirements.txt      # pip 의존성 파일
+└── README.md            # 프로젝트 문서
+```
 ---
 
 #### 기타 내용
