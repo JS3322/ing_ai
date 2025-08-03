@@ -5,28 +5,36 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Make Data",
-            "type": "debugpy",
+            "name": "Python: create_wfmap_chart.py",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/create_wfmap_chart.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Python: create_wfmap_chart.py (Debug)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/create_wfmap_chart.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "stopOnEntry": false,
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Python: main.py with JSON config",
+            "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/main.py",
             "args": ["_source/example/request_makedata.json"],
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Train Model",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "args": ["_source/example/request_train.json"],
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Run Inference",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/main.py",
-            "args": ["_source/example/request_inference.json"],
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
