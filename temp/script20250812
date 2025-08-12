@@ -142,3 +142,58 @@ if [ "$birth" -lt "$TODAY_EPOCH" ]; then
   fi
 fi
 ' sh {}
+
+
+
+
+
+
+#!/bin/csh -f
+# usage: link_public_assets.csh <BASE_DIR> <TODAY:YYYY-MM-DD>
+# ex   : link_public_assets.csh /data/projects 2025-08-12
+
+if ( $#argv != 2 ) then
+  echo "Usage: $0 <BASE_DIR> <TODAY:YYYY-MM-DD>"
+  exit 1
+endif
+
+set BASE_DIR  = "$1"
+set TODAY_STR = "$2"
+
+if ( ! -d "$BASE_DIR" ) then
+  echo "ERROR: BASE_DIR not found: $BASE_DIR"
+  exit 1
+endif
+
+# 당신이 말씀하신 형태 그대로 사용 (GNU date 가정)
+set TODAY_EPOCH = `date -d "$TODAY_STR" + %s 2>/dev/null`
+if ( "$TODAY_EPOCH" == "" ) then
+  echo "ERROR: Invalid TODAY (expect YYYY-MM-DD): $TODAY_STR"
+  exit 1
+endif
+setenv TODAY_EPOCH "$TODAY_EPOCH"
+
+# 공백/한글 경로 안전 (-print0 / -0)
+find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d -print0 | \
+xargs -0 -I{} sh -c '
+d="$1"
+
+# 생성시각(%W) 없으면 수정시각(%Y)
+b=$(stat -c %W "$d" 2>/dev/null) || b=0
+[ -z "$b" ] && b=0
+if [ "$b" -le 0 ]; then
+  b=$(stat -c %Y "$d" 2>/dev/null) || b=0
+fi
+
+# 기준일 이전만 처리
+if [ "$b" -lt "$TODAY_EPOCH" ]; then
+  link="$d/public_assets"
+  if [ -L "$link" ]; then
+    : # 이미 심볼릭 링크면 무시 (필요시 갱신하려면 ln -sfn 사용)
+  elif [ -e "$link" ]; then
+    echo "[SKIP] exists (not symlink): $link"
+  else
+    ln -s "$d" "$link" && echo "[OK] $link -> $d" || echo "[ERR] $link"
+  fi
+fi
+' sh {}
