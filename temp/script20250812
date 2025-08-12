@@ -61,3 +61,84 @@ foreach d ( `find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d | sort` )
     endif
   endif
 end
+
+
+
+
+
+
+
+#!/bin/csh -f
+# usage: link_public_assets.csh <BASE_DIR> <TODAY:YYYY-MM-DD>
+# ex   : link_public_assets.csh /data/projects 2025-08-12
+
+if ( $#argv != 2 ) then
+  echo "Usage: $0 <BASE_DIR> <TODAY:YYYY-MM-DD>"
+  exit 1
+endif
+
+set BASE_DIR  = "$1"
+set TODAY_STR = "$2"
+
+if ( ! -d "$BASE_DIR" ) then
+  echo "ERROR: BASE_DIR not found: $BASE_DIR"
+  exit 1
+endif
+
+# YYYY-MM-DD -> epoch (Linux/GNU date vs macOS/BSD date 둘 다 대응)
+switch (`uname`)
+  case "Linux":
+    set TODAY_EPOCH = `date -d "$TODAY_STR" +%s 2>/dev/null`
+    breaksw
+  case "Darwin":
+    set TODAY_EPOCH = `date -j -f "%Y-%m-%d" "$TODAY_STR" "+%s" 2>/dev/null`
+    breaksw
+  default:
+    echo "ERROR: Unsupported OS: `uname`"
+    exit 1
+endsw
+if ( "$TODAY_EPOCH" == "" ) then
+  echo "ERROR: Invalid TODAY (expect YYYY-MM-DD): $TODAY_STR"
+  exit 1
+endif
+
+echo "[INFO] base_dir=$BASE_DIR  today=$TODAY_STR (epoch $TODAY_EPOCH)"
+setenv TODAY_EPOCH "$TODAY_EPOCH"
+
+# 공백/한글 경로 안전 처리: -print0 | xargs -0
+# 각 디렉토리 내부에 public_assets -> 그 디렉토리(자기 자신)를 가리키는 심볼릭 링크 생성
+find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d -print0 | \
+xargs -0 -I{} sh -c '
+d="$1"
+
+# birth time 우선 시도 (GNU: %W, BSD: %B), 없으면 mtime (GNU: %Y, BSD: %m)
+birth=0
+if b=$(stat -c %W "$d" 2>/dev/null) && [ "${b:-0}" -gt 0 ]; then
+  birth="$b"
+elif b=$(stat -f %B "$d" 2>/dev/null) && [ "${b:-0}" -gt 0 ]; then
+  birth="$b"
+elif b=$(stat -c %Y "$d" 2>/dev/null) 2>/dev/null; then
+  birth="$b"
+elif b=$(stat -f %m "$d" 2>/dev/null) 2>/dev/null; then
+  birth="$b"
+fi
+
+# today 이전이면 링크 시도
+if [ "$birth" -lt "$TODAY_EPOCH" ]; then
+  link_path="$d/public_assets"
+  # 자기 자신을 가리키게 하려면 절대경로 심볼릭 링크가 안전합니다.
+  # (cd 필요 없이 동작, 공백 경로 안전)
+  if [ -L "$link_path" ]; then
+    echo "[SKIP] symlink exists: $link_path"
+  elif [ -e "$link_path" ]; then
+    echo "[SKIP] exists (not symlink): $link_path"
+  else
+    ln -s "$d" "$link_path"
+    if [ $? -eq 0 ]; then
+      echo "[OK] $link_path -> $d"
+    else
+      echo "[ERR] failed: $link_path -> $d"
+    fi
+  fi
+fi
+' sh {}
