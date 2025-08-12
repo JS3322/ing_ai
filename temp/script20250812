@@ -1,0 +1,63 @@
+#!/bin/csh -f
+# usage: link_public_assets.csh <BASE_DIR> <TODAY:YYYY-MM-DD>
+# ex   : link_public_assets.csh /data/projects 2025-08-12
+#
+# 동작:
+# - BASE_DIR 바로 아래의 디렉토리들을 확인
+# - 생성일(birth time, %W) 없으면 수정시각(%Y)으로 대체
+# - TODAY 이전에 만들어진 디렉토리들 각각의 내부에
+#   "public_assets" 심볼릭 링크를 생성 (타겟은 그 디렉토리 자신)
+#   => ln -s . public_assets  (상대경로 사용)
+
+if ( $#argv != 2 ) then
+  echo "Usage: $0 <BASE_DIR> <TODAY:YYYY-MM-DD>"
+  exit 1
+endif
+
+set BASE_DIR  = "$1"
+set TODAY_STR = "$2"
+
+if ( ! -d "$BASE_DIR" ) then
+  echo "ERROR: BASE_DIR not found: $BASE_DIR"
+  exit 1
+endif
+
+# YYYY-MM-DD -> epoch(sec)
+set TODAY_EPOCH = `date -d "$TODAY_STR" +%s 2>/dev/null`
+if ( "$TODAY_EPOCH" == "" ) then
+  echo "ERROR: Invalid TODAY (expect YYYY-MM-DD): $TODAY_STR"
+  exit 1
+endif
+
+echo "[INFO] base_dir = $BASE_DIR"
+echo "[INFO] today    = $TODAY_STR (epoch $TODAY_EPOCH)"
+echo "----------------------------------------------"
+
+# BASE_DIR 바로 아래 디렉토리만
+foreach d ( `find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d | sort` )
+
+  # 생성일(%W) → 없으면 수정시각(%Y)
+  set BIRTH = `stat -c %W "$d" 2>/dev/null`
+  if ( "$BIRTH" == "" ) set BIRTH = 0
+  if ( $BIRTH <= 0 ) then
+    set BIRTH = `stat -c %Y "$d" 2>/dev/null`
+    if ( "$BIRTH" == "" ) set BIRTH = 0
+  endif
+
+  if ( $BIRTH < $TODAY_EPOCH ) then
+    set LINK_PATH = "$d/public_assets"
+
+    if ( -L "$LINK_PATH" ) then
+      echo "[SKIP] symlink exists: $LINK_PATH"
+    else if ( -e "$LINK_PATH" ) then
+      echo "[SKIP] exists (not symlink): $LINK_PATH"
+    else
+      (cd "$d" && ln -s . public_assets)
+      if ( $status == 0 ) then
+        echo "[OK] $LINK_PATH -> $d"
+      else
+        echo "[ERR] Failed to create link in $d"
+      endif
+    endif
+  endif
+end
