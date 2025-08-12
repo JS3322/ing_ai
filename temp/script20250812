@@ -276,3 +276,41 @@ foreach d ( `find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d` )
         endif
     endif
 end
+
+
+
+
+
+#!/bin/csh -f
+# usage: link_public_assets.csh <BASE_DIR>
+
+if ( $#argv != 1 ) then
+  echo "Usage: $0 <BASE_DIR>"
+  exit 1
+endif
+
+set BASE_DIR = "$1"
+
+if ( ! -d "$BASE_DIR" ) then
+  echo "ERROR: BASE_DIR not found: $BASE_DIR"
+  exit 1
+endif
+
+# BASE_DIR 바로 아래 디렉토리만 처리
+foreach d ( `find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d` )
+  set link = "$d/public_assets"
+
+  # public_assets 디렉토리가 없으면 심볼릭 링크 생성
+  if ( -d "$link" ) then
+    continue  # 이미 실제 디렉토리면 건너뜀
+  else if ( -e "$link" ) then
+    continue  # 파일/다른 링크가 있으면 건너뜀
+  else
+    ln -s "$d" "$link"
+    if ( $status == 0 ) then
+      echo "[OK] Created symlink: $link -> $d"
+    else
+      echo "[ERR] Failed to create symlink in $d"
+    endif
+  endif
+end
