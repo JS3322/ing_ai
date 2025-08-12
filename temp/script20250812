@@ -251,3 +251,28 @@ if [ "$b" -lt "$TODAY_EPOCH" ]; then
   fi
 fi
 ' sh {}
+
+
+
+
+# BASE_DIR 바로 아래 디렉토리만
+foreach d ( `find "$BASE_DIR" -mindepth 1 -maxdepth 1 -type d` )
+    # 생성시각(%W) 없으면 수정시각(%Y)
+    set b = `stat -c %W "$d"`
+    if ( "$b" == "0" || "$b" == "-1" ) then
+        set b = `stat -c %Y "$d"`
+    endif
+
+    # 기준일 이전이면 링크 생성
+    if ( $b < $TODAY_EPOCH ) then
+        set link = "$d/public_assets"
+        if ( -L "$link" ) then
+            # 이미 심볼릭 링크면 건너뜀
+        else if ( -e "$link" ) then
+            # 같은 이름의 파일/디렉토리가 있으면 건너뜀
+        else
+            ln -s "$d" "$link"
+            echo "[OK] $link -> $d"
+        endif
+    endif
+end
